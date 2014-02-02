@@ -35,7 +35,7 @@ public final class Example
 
   public void onModuleLoad()
   {
-    final WebPoller webPoller = WebPoller.newWebPoller( this, true );
+    final WebPoller webPoller = WebPoller.newWebPoller( this );
     registerListeners( webPoller );
 
     _start = new Button( "Start", new ClickHandler()
@@ -45,6 +45,7 @@ public final class Example
       {
         _start.setEnabled( false );
         _longPoll.setEnabled( false );
+        webPoller.setLongPoll( _longPoll.getValue() == Boolean.TRUE );
         webPoller.start();
       }
     } );
