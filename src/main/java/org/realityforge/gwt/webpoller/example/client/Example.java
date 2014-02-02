@@ -33,7 +33,8 @@ public final class Example
 
   public void onModuleLoad()
   {
-    final WebPoller webPoller = WebPoller.newWebPoller( this );
+    final WebPoller webPoller = WebPoller.newWebPoller();
+    webPoller.setRequestFactory( this );
     registerListeners( webPoller );
 
     _start = new Button( "Start", new ClickHandler()
