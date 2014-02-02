@@ -6,10 +6,7 @@ import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -17,15 +14,16 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import javax.annotation.Nonnull;
+import org.realityforge.gwt.webpoller.client.AbstractHttpRequestFactory;
 import org.realityforge.gwt.webpoller.client.WebPoller;
-import org.realityforge.gwt.webpoller.client.WebPoller.RequestFactory;
 import org.realityforge.gwt.webpoller.client.event.ErrorEvent;
 import org.realityforge.gwt.webpoller.client.event.MessageEvent;
 import org.realityforge.gwt.webpoller.client.event.StartEvent;
 import org.realityforge.gwt.webpoller.client.event.StopEvent;
 
 public final class Example
-  implements EntryPoint, RequestFactory
+  extends AbstractHttpRequestFactory
+  implements EntryPoint
 {
   private HTML _messages;
   private ScrollPanel _scrollPanel;
@@ -77,40 +75,17 @@ public final class Example
     }
   }
 
-  @Nonnull
   @Override
-  public RequestBuilder getRequestBuilder( @Nonnull final RequestCallback callback )
+  protected RequestBuilder getRequestBuilder()
   {
-    final RequestBuilder rb = new RequestBuilder( RequestBuilder.GET, getPollURL() );
-    rb.setCallback( new RequestCallback()
-    {
-      @Override
-      public void onResponseReceived( final Request request, final Response response )
-      {
-        if ( Response.SC_OK == response.getStatusCode() )
-        {
-          callback.onResponseReceived( request, response );
-        }
-        else
-        {
-          callback.onError( request, new Exception( "Bad response code" ) );
-        }
-      }
-
-      @Override
-      public void onError( final Request request, final Throwable exception )
-      {
-        callback.onError( request, exception );
-      }
-    } );
-    return rb;
+    return new RequestBuilder( RequestBuilder.GET, getPollURL() );
   }
 
   private String getPollURL()
   {
     final String moduleBaseURL = GWT.getModuleBaseURL();
     final String moduleName = GWT.getModuleName();
-    final String suffix = _longPoll.getValue() == Boolean.TRUE ? "/long" : "";
+    final String suffix = null != _longPoll && _longPoll.getValue() == Boolean.TRUE ? "/long" : "";
     return moduleBaseURL.substring( 0, moduleBaseURL.length() - moduleName.length() - 1 ) + "api/time" + suffix;
   }
 
