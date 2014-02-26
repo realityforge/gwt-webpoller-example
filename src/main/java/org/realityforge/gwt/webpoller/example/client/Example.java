@@ -13,13 +13,11 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
+import java.util.Map;
 import javax.annotation.Nonnull;
 import org.realityforge.gwt.webpoller.client.AbstractHttpRequestFactory;
 import org.realityforge.gwt.webpoller.client.WebPoller;
-import org.realityforge.gwt.webpoller.client.event.ErrorEvent;
-import org.realityforge.gwt.webpoller.client.event.MessageEvent;
-import org.realityforge.gwt.webpoller.client.event.StartEvent;
-import org.realityforge.gwt.webpoller.client.event.StopEvent;
+import org.realityforge.gwt.webpoller.client.WebPollerListenerAdapter;
 
 public final class Example
   extends AbstractHttpRequestFactory
@@ -92,43 +90,39 @@ public final class Example
 
   private void registerListeners( final WebPoller webPoller )
   {
-    webPoller.addStartHandler( new StartEvent.Handler()
+    webPoller.setListener( new WebPollerListenerAdapter()
     {
       @Override
-      public void onStartEvent( @Nonnull final StartEvent event )
+      public void onStart( @Nonnull final WebPoller webPoller )
       {
         appendText( "start", "silver" );
         _stop.setEnabled( true );
       }
-    } );
-    webPoller.addStopHandler( new StopEvent.Handler()
-    {
+
       @Override
-      public void onStopEvent( @Nonnull final StopEvent event )
+      public void onStop( @Nonnull final WebPoller webPoller )
       {
         appendText( "stop", "silver" );
         _start.setEnabled( true );
         _longPoll.setEnabled( true );
         _stop.setEnabled( false );
       }
-    } );
-    webPoller.addErrorHandler( new ErrorEvent.Handler()
-    {
+
       @Override
-      public void onErrorEvent( @Nonnull final ErrorEvent event )
+      public void onMessage( @Nonnull final WebPoller webPoller,
+                             @Nonnull final Map<String, String> context,
+                             @Nonnull final String data )
+      {
+        appendText( "message: " + data, "black" );
+      }
+
+      @Override
+      public void onError( @Nonnull final WebPoller webPoller, @Nonnull final Throwable exception )
       {
         appendText( "error", "red" );
         _start.setEnabled( false );
         _longPoll.setEnabled( false );
         _stop.setEnabled( false );
-      }
-    } );
-    webPoller.addMessageHandler( new MessageEvent.Handler()
-    {
-      @Override
-      public void onMessageEvent( @Nonnull final MessageEvent event )
-      {
-        appendText( "message: " + event.getData(), "black" );
       }
     } );
   }
