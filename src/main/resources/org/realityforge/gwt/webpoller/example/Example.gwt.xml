@@ -4,6 +4,9 @@
   <inherits name="org.realityforge.gwt.webpoller.WebPoller"/>
   <add-linker name="xsiframe"/>
 
+  <!-- Compile a single permutation for all platforms -->
+  <collapse-all-properties/>
+
   <entry-point class='org.realityforge.gwt.webpoller.example.client.Example'/>
 
   <source path='client'/>
