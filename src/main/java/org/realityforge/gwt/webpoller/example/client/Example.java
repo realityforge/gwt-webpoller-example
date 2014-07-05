@@ -14,6 +14,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import java.util.Map;
+import java.util.logging.Level;
 import javax.annotation.Nonnull;
 import org.realityforge.gwt.webpoller.client.AbstractHttpRequestFactory;
 import org.realityforge.gwt.webpoller.client.WebPoller;
@@ -28,6 +29,7 @@ public final class Example
   private Button _stop;
   private Button _start;
   private CheckBox _longPoll;
+  private CheckBox _longErrorBackOff;
 
   public void onModuleLoad()
   {
@@ -42,7 +44,10 @@ public final class Example
       {
         _start.setEnabled( false );
         _longPoll.setEnabled( false );
-        webPoller.setLongPoll( _longPoll.getValue() == Boolean.TRUE );
+        _longErrorBackOff.setEnabled( false );
+        webPoller.setLogLevel( Level.INFO );
+        webPoller.setInterRequestDuration( _longPoll.getValue() == Boolean.TRUE ? 0 : 2000 );
+        webPoller.setInterErrorDuration( _longErrorBackOff.getValue() == Boolean.TRUE ? 5000 : 0 );
         webPoller.start();
       }
     } );
@@ -58,6 +63,7 @@ public final class Example
     _stop.setEnabled( false );
 
     _longPoll = new CheckBox( "Long Poll" );
+    _longErrorBackOff = new CheckBox( "Error Backoff" );
 
     _messages = new HTML();
     _scrollPanel = new ScrollPanel();
@@ -68,6 +74,7 @@ public final class Example
     {
       final FlowPanel controls = new FlowPanel();
       controls.add( _longPoll );
+      controls.add( _longErrorBackOff );
       controls.add( _start );
       controls.add( _stop );
       RootPanel.get().add( controls );
@@ -105,6 +112,7 @@ public final class Example
         appendText( "stop", "silver" );
         _start.setEnabled( true );
         _longPoll.setEnabled( true );
+        _longErrorBackOff.setEnabled( true );
         _stop.setEnabled( false );
       }
 
@@ -120,9 +128,8 @@ public final class Example
       public void onError( @Nonnull final WebPoller webPoller, @Nonnull final Throwable exception )
       {
         appendText( "error", "red" );
-        _start.setEnabled( false );
         _longPoll.setEnabled( false );
-        _stop.setEnabled( false );
+        _longErrorBackOff.setEnabled( false );
       }
     } );
   }
